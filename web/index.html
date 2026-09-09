@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Практика по делу</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <p class="kicker">CrewAI · пилот вне JuristStudio</p>
+      <h1>Практика по делу</h1>
+      <p class="lead">Тема или файл оппонента → практика «за» и «против» → сверка цитат → дневник.</p>
+    </header>
+    <form id="form">
+      <label for="topic">Тема</label>
+      <textarea id="topic" name="topic" rows="3" placeholder="Например: оспаривание перевода как сделки с предпочтением, ст. 61.3 127-ФЗ"></textarea>
+      <label for="file">Файл оппонента (txt / md / docx)</label>
+      <input id="file" name="file" type="file" accept=".txt,.md,.docx,text/plain">
+      <div class="actions">
+        <button type="submit" id="run">Запустить экипаж</button>
+        <button type="button" id="quit" class="ghost">Выход</button>
+      </div>
+    </form>
+    <p id="status" class="status" hidden></p>
+    <section id="result-wrap" hidden>
+      <h2>Дневник</h2>
+      <p id="paths" class="paths"></p>
+      <pre id="result"></pre>
+    </section>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

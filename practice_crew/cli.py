@@ -3,20 +3,18 @@
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
 from pathlib import Path
 
-from practice_crew.crew import build_crew
-from practice_crew.diary import save_diary
-from practice_crew.extract import extract_text
 from practice_crew.logging_setup import setup_logging
+from practice_crew.run import run_practice_job
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="CrewAI-пилот: судебная практика")
     parser.add_argument("--file", type=Path, help="Локальный txt/md/docx оппонента")
     parser.add_argument("--topic", type=str, default="", help="Тема, если файла нет")
+    parser.add_argument("--web", action="store_true", help="Открыть десктоп-приложение")
     args = parser.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -24,33 +22,19 @@ def main(argv: list[str] | None = None) -> int:
         except (AttributeError, OSError):
             pass
 
+    if args.web:
+        from practice_crew.webapp import main as web_main
+
+        return web_main()
+
     log = setup_logging()
     if not args.file and not args.topic.strip():
-        log.error("Нужен --file или --topic")
+        log.error("Нужен --file или --topic (или --web)")
         return 2
-
-    source_note = _build_source_note(args.file, args.topic, log)
-    topic = (args.topic or "").strip() or (args.file.name if args.file else "без темы")
-    log.info("Старт экипажа. Тема: %s", topic)
-
-    crew = build_crew(source_note=source_note)
-    result = crew.kickoff(inputs={"source_note": source_note})
-    text = str(result)
-    md_path, json_path = save_diary(text, topic=topic)
-    log.info("Дневник: %s", md_path)
-    log.info("JSON: %s", json_path)
-    print(md_path)
+    try:
+        out = run_practice_job(topic=args.topic, file_path=args.file)
+    except Exception:
+        log.exception("Прогон экипажа не удался")
+        return 1
+    print(out["md_path"])
     return 0
-
-
-def _build_source_note(file_path: Path | None, topic: str, log: logging.Logger) -> str:
-    parts: list[str] = []
-    if topic.strip():
-        parts.append(f"Тема пользователя: {topic.strip()}")
-    if file_path:
-        resolved = file_path.resolve()
-        log.info("Читаю файл: %s", resolved)
-        preview = extract_text(resolved)
-        parts.append(f"Путь к файлу: {resolved}")
-        parts.append("Текст файла:\n" + preview)
-    return "\n\n".join(parts)
