@@ -41,6 +41,14 @@ copy .env.example .env
 # вписать QWEN_API_KEY
 python -m practice_crew --file samples\opponent_excerpt.txt
 python -m practice_crew --web
+
+# облачный Qwen или локальный Ollama (вторая LLM)
+python -m practice_crew --llm-mode cloud --topic "ст. 61.2 127-ФЗ"
+python -m practice_crew --llm-mode ollama --topic "ст. 61.2 127-ФЗ"
+python scripts\set_llm_mode.py ollama
+python scripts\set_llm_mode.py cloud
+
+Перед локальным режимом: `D:\Ollama\ollama.exe serve` и модель `qwen2.5:1.5b`.
 ```
 
 По теме без файла:

@@ -18,6 +18,11 @@
       <textarea id="topic" name="topic" rows="3" placeholder="Например: оспаривание перевода как сделки с предпочтением, ст. 61.3 127-ФЗ"></textarea>
       <label for="file">Файл оппонента (txt / md / docx)</label>
       <input id="file" name="file" type="file" accept=".txt,.md,.docx,text/plain">
+      <fieldset class="modes">
+        <legend>Модель</legend>
+        <label class="mode"><input type="radio" name="llm_mode" value="cloud" checked> Облачный Qwen</label>
+        <label class="mode"><input type="radio" name="llm_mode" value="ollama"> Локальный Ollama (qwen2.5:1.5b)</label>
+      </fieldset>
       <div class="actions">
         <button type="submit" id="run">Запустить экипаж</button>
         <button type="button" id="quit" class="ghost">Выход</button>

@@ -25,13 +25,18 @@ def build_source_note(file_path: Path | None, topic: str) -> str:
     return "\n\n".join(parts)
 
 
-def run_practice_job(*, topic: str = "", file_path: Path | None = None) -> dict[str, str]:
+def run_practice_job(
+    *,
+    topic: str = "",
+    file_path: Path | None = None,
+    llm_mode: str | None = None,
+) -> dict[str, str]:
     if file_path is None and not topic.strip():
         raise ValueError("Нужны тема или файл оппонента")
     source_note = build_source_note(file_path, topic)
     label = topic.strip() or (file_path.name if file_path else "без темы")
-    log.info("Старт экипажа. Тема: %s", label)
-    crew = build_crew(source_note=source_note)
+    log.info("Старт экипажа. Тема: %s режим=%s", label, llm_mode or "env")
+    crew = build_crew(source_note=source_note, llm_mode=llm_mode)
     result = crew.kickoff(inputs={"source_note": source_note})
     text = str(result)
     md_path, json_path = save_diary(text, topic=label)

@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from crewai import Agent, Crew, Process, Task
 
-from practice_crew.llm import build_qwen_llm
+from practice_crew.llm import build_llm
 from practice_crew.tools import read_local_legal_file
 
 
-def build_crew(*, source_note: str) -> Crew:
-    llm = build_qwen_llm()
+def build_crew(*, source_note: str, llm_mode: str | None = None) -> Crew:
+    llm = build_llm(llm_mode)
 
     extractor = Agent(
         role="Извлекатель тезисов и цитат",

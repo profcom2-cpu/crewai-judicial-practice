@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-09-10
+
+- Переключение LLM: облачный Qwen (`cloud`) и локальный Ollama `qwen2.5:1.5b` (`ollama`).
+- CLI `--llm-mode`, UI-переключатель, `scripts/set_llm_mode.py`.
+
 ## 0.2.0 — 2026-09-10
 
 - Отдельный фронтенд (`web/`) и локальный сервер `practice_crew.webapp`.

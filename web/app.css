@@ -37,6 +37,14 @@ form {
   gap: 8px;
 }
 label { font-size: 14px; color: var(--muted); }
+.modes {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+.modes legend { color: var(--muted); font-size: 14px; }
+.mode { display: flex; gap: 8px; align-items: center; color: var(--ink); }
 textarea, input[type="file"] {
   width: 100%;
   border: 1px solid var(--line);

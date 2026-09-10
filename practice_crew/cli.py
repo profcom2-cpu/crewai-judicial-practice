@@ -15,6 +15,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--file", type=Path, help="Локальный txt/md/docx оппонента")
     parser.add_argument("--topic", type=str, default="", help="Тема, если файла нет")
     parser.add_argument("--web", action="store_true", help="Открыть десктоп-приложение")
+    parser.add_argument(
+        "--llm-mode",
+        choices=("cloud", "ollama", "allama", "qwen"),
+        default=None,
+        help="cloud/qwen = облачный Qwen; ollama/allama = локальный qwen2.5:1.5b",
+    )
     args = parser.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -32,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
         log.error("Нужен --file или --topic (или --web)")
         return 2
     try:
-        out = run_practice_job(topic=args.topic, file_path=args.file)
+        out = run_practice_job(topic=args.topic, file_path=args.file, llm_mode=args.llm_mode)
     except Exception:
         log.exception("Прогон экипажа не удался")
         return 1

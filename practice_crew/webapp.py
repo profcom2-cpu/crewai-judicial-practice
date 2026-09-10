@@ -19,7 +19,16 @@ from starlette.responses import FileResponse, JSONResponse, PlainTextResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
-from practice_crew.config import OUTPUT_DIR, PROJECT_ROOT, require_qwen_key
+from practice_crew.config import (
+    OLLAMA_MODEL,
+    OUTPUT_DIR,
+    PROJECT_ROOT,
+    QWEN_API_KEY,
+    QWEN_MODEL,
+    llm_connection,
+    normalize_llm_mode,
+    probe_ollama,
+)
 from practice_crew.logging_setup import setup_logging
 from practice_crew.run import run_practice_job
 
@@ -36,7 +45,19 @@ _server: uvicorn.Server | None = None
 
 
 def _health(_request: Request) -> JSONResponse:
-    return JSONResponse({"ok": True, "app": "practice-crew"})
+    ollama_ok, ollama_detail = probe_ollama()
+    return JSONResponse(
+        {
+            "ok": True,
+            "app": "practice-crew",
+            "cloud": {"model": QWEN_MODEL, "configured": bool(QWEN_API_KEY)},
+            "ollama": {
+                "model": OLLAMA_MODEL,
+                "reachable": ollama_ok,
+                "detail": ollama_detail,
+            },
+        }
+    )
 
 
 def _index(_request: Request) -> FileResponse:
@@ -60,26 +81,27 @@ async def _api_run(request: Request) -> JSONResponse:
     if not topic and file_path is None:
         return JSONResponse({"error": "Укажите тему или приложите файл"}, status_code=400)
     try:
-        require_qwen_key()
-    except RuntimeError as exc:
+        llm_mode = normalize_llm_mode(str(form.get("llm_mode") or "") or None)
+        mode, _key, base, model = llm_connection(llm_mode)
+    except (RuntimeError, ValueError) as exc:
         return JSONResponse({"error": str(exc)}, status_code=503)
 
     job_id = uuid.uuid4().hex
     with _jobs_lock:
-        _jobs[job_id] = {"status": "running", "log": "Запуск экипажа…\n"}
-    log.info("UI-задача %s тема=%r файл=%s", job_id, topic, file_path)
+        _jobs[job_id] = {"status": "running", "log": f"Режим {mode} ({model})\n"}
+    log.info("UI-задача %s режим=%s модель=%s тема=%r файл=%s", job_id, mode, model, topic, file_path)
     threading.Thread(
         target=_run_job,
-        args=(job_id, topic, file_path),
+        args=(job_id, topic, file_path, llm_mode),
         daemon=True,
         name=f"practice-job-{job_id[:8]}",
     ).start()
     return JSONResponse({"job_id": job_id})
 
 
-def _run_job(job_id: str, topic: str, file_path: Path | None) -> None:
+def _run_job(job_id: str, topic: str, file_path: Path | None, llm_mode: str | None = None) -> None:
     try:
-        result = run_practice_job(topic=topic, file_path=file_path)
+        result = run_practice_job(topic=topic, file_path=file_path, llm_mode=llm_mode)
         with _jobs_lock:
             _jobs[job_id] = {"status": "done", **result}
         log.info("UI-задача %s готова: %s", job_id, result.get("md_path"))
