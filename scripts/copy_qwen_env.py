@@ -37,7 +37,7 @@ def main() -> int:
         or vals.get("DOC_ANALYZER_QWEN_BASE_URL")
         or "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
     )
-    model = vals.get("QWEN_MODEL") or vals.get("DOC_ANALYZER_QWEN_MODEL") or "qwen-plus"
+    model = vals.get("QWEN_MODEL") or vals.get("DOC_ANALYZER_QWEN_MODEL") or "qwen3.8-max"
     DST.write_text(
         f"QWEN_API_KEY={qwen}\nQWEN_BASE_URL={base}\nQWEN_MODEL={model}\n",
         encoding="utf-8",
