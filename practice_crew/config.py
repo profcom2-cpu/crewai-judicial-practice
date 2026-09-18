@@ -16,7 +16,7 @@ QWEN_API_KEY = (
 QWEN_BASE_URL = (
     os.getenv("QWEN_BASE_URL")
     or os.getenv("DOC_ANALYZER_QWEN_BASE_URL")
-    or "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+    or "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"
 ).strip()
 QWEN_MODEL = (
     os.getenv("QWEN_MODEL") or os.getenv("DOC_ANALYZER_QWEN_MODEL") or "qwen3.8-max"
